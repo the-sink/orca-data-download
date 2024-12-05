@@ -1,7 +1,7 @@
 # orca-data-download
 Instructions on downloading usage data for managed ORCA cards
 
-After trying to use [moshobo/orca-wrapped](https://github.com/moshobo/orca-wrapped), I noticed on the nyORCA website that managed/load-only cards provided by employers, colleges, etc do not let you view usage data on the website. However, I was curious if this data was still technically accessible to the user but just not visible on the site. As it turns out, it is! (at least, it was in my specific case and I hope this works for others too...)
+After trying to use [moshobo/orca-wrapped](https://github.com/moshobo/orca-wrapped), I noticed on the myORCA website that managed/load-only cards provided by employers, colleges, etc do not let you view usage data on the website. However, I was curious if this data was still technically accessible to the user but just not visible on the site. As it turns out, it is! (at least, it was in my specific case and I hope this works for others too...)
 
 This guide assumes you are using a Windows device and the Google Chrome web browser as that is what I'm using here, however you may be able to adapt this to other machines and browsers on your own. To do this, you will need to use your browser's developer tools/"inspect element" mode to view the network requests being made by the site.
 
