@@ -1,0 +1,86 @@
+<html>
+<body>
+    <p>Select JSON file:</p>
+    <input type="file" id="fileInput">
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const reader = new FileReader();
+
+        const header = `"Date","Time","Location","Agency","Activity","+/-","Balance"`;
+
+        const operators = [
+            null, null, 
+            "Community Transit",
+            "Everett Transit",
+            "King County Metro",
+            "Kitsap Transit",
+            "Pierce Transit",
+            "Sound Transit",
+            "Washington State Ferries"
+        ];
+
+        function formatTime(date) {
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            let ampm = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12 || 12;
+            minutes = minutes.toString().padStart(2, '0');
+            return `${hours}:${minutes}${ampm}`;
+        };
+
+        function formatBalance(number) {
+            return `${number < 0 ? '-' : ''}$${Math.abs(number / 100.0).toFixed(2)}`;
+        }
+
+        reader.addEventListener(
+            "load",
+            () => {
+                const data = JSON.parse(reader.result);
+                const items = data['Data'];
+
+                let newCSVFile = header;
+                
+                let lastBalance = 0.0;
+
+                items.toReversed().forEach((item) => { // reversed to calculate balance difference between entries
+                    const transaction = item['Transaction'];
+                    if (!transaction['StopName']) return;
+                    const dateObj = new Date(transaction['Timestamp']);
+                    const dateString = dateObj.toLocaleDateString();
+                    const timeString = formatTime(dateObj);
+                    const locationString = `Line: ${transaction['LineName']}, Stop: ${transaction['StopName']}`;
+                    const agencyString = operators[transaction['OperatorId']];
+                    const activityString = `${transaction['TransactionType']}`;//, ${transaction['TicketName']}`; // someone can add vehicle numbers to this if they know how that works <3
+                    const balance = transaction['PurseBalance'];
+                    const balanceString = formatBalance(balance);
+                    const difference = balance - lastBalance;
+                    const differenceString = formatBalance(difference);
+
+                    const csvLine = `\n"${dateString}","${timeString}","${locationString}","${agencyString}","${activityString}","${differenceString}","${balanceString}"`;
+
+                    lastBalance = balance;
+
+                    newCSVFile += csvLine;
+                });
+
+                const blob = new Blob([newCSVFile], {type:'text/csv;charset=utf-8;'});
+
+                var dlLink = document.createElement('a');
+                dlLink.href = URL.createObjectURL(blob);
+                dlLink.setAttribute('download', 'Card-Activity.csv');
+                dlLink.click();
+                dlLink.remove();
+                fileInput.value = null;
+            },
+            false,
+        );
+
+        fileInput.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        reader.readAsText(file, 'UTF-8');
+        });
+    </script>
+</body>
+</html>
